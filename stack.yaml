@@ -1,0 +1,9 @@
+flags: {}
+extra-package-dbs: []
+packages:
+- '.'
+extra-deps:
+- distributed-process-0.6.6
+- distributed-process-simplelocalnet-0.2.3.3
+- network-multicast-0.1.2
+resolver: lts-7.11

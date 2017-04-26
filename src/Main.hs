@@ -345,25 +345,13 @@ kmeans_strat_cloud numChunks nclusters points clusters slaves =
 
 masterKmeans :: Int -> [Cluster] -> [[Point]] -> [ProcessId] -> Process [Cluster]
 masterKmeans nclusters clusters pointss slaveProcesses = do
-    --us <- getSelfPid
-    --liftIO $ putStrLn "Master!!!"
-   -- liftIO $ putStrLn "!!!!!"
-    --slaveProcesses <- forM slaves $ \nid -> Control.Distributed.Process.spawn nid ($(mkClosure 'slave) us)
-    --liftIO $ putStrLn "????"
     let n = length pointss
-    --let nn =length $ head pointss
-    liftIO $ putStrLn $ (show n)
-    --let pp = zip [1..n] pointss
+    --liftIO $ putStrLn $ (show n)
     spawnLocal $ forM_ (zip [1..n] (cycle slaveProcesses)) $
         \(m, them) -> send them (nclusters, clusters, m)
-    --liftIO $ putStrLn $ (show n) ++ " Sum" 
     cls <- sumPoint n
-    --liftIO $ putStrLn $ (show $ length cls) ++ "end"
     let sorted = sort cls
-    --forM_ sorted (\(x, y) -> liftIO $ putStrLn $ show x)
     let ret = map (\x -> snd x) sorted
-    --liftIO $ putStrLn "Sort"
-    --let vec_cls = Vector.fromList cls 
     return (makeNewClusters $ foldr1 combine $ ret)
     where
         sort :: [(Int, Vector PointSum)] -> [(Int, Vector PointSum)]
@@ -379,14 +367,9 @@ sumPoint = go []
         go :: [(Int, Vector PointSum)] -> Int -> Process [(Int, Vector PointSum)]
         go !xs 0 = return xs
         go !xs n =do
-            --liftIO $ putStrLn "Ent"
             (i, x) <- expect :: Process ((Int, [PointSum]))
             let vec = Vector.fromList x
-            --liftIO $ putStrLn $ "!!!! : " ++ (show n) ++ (show i)
             go (xs ++ [(i, vec)]) (n-1)
-
-           
-
                         
 rtable :: RemoteTable
 rtable = __remoteTable initRemoteTable
